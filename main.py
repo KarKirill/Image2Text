@@ -18,6 +18,8 @@ transform = transforms.Compose([
 train_dataset = datasets.MNIST(root='mnist', train=True, download=True, transform=transform)
 test_dataset = datasets.MNIST(root='mnist', train=False, download=True, transform=transform)
 
+
+
 # Создание DataLoader
 train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
@@ -45,7 +47,60 @@ class BaseModel(nn.Module):
         x = nn.functional.relu(self.bn3(self.fc1(x)))
         x = self.dropout2(x)
         x = self.fc2(x)
+    
         return x
+    
+    # def visualize_activations(self, dataset, num_images=5):
+    #     """
+    #     Визуализация исходных изображений, активаций после conv1 и conv2.
+        
+    #     Args:
+    #         dataset: Объект Dataset (например, train_dataset).
+    #         num_images: Количество изображений для отображения.
+    #     """
+    #     # Устанавливаем модель в режим оценки
+    #     self.eval()
+
+    #     # Создаем фигуру для визуализации
+    #     fig, axes = plt.subplots(num_images, 3, figsize=(15, 5 * num_images))
+    #     fig.tight_layout()
+
+    #     for i in range(min(num_images, len(dataset))):
+    #         # Получаем изображение и метку из датасета
+    #         x, y = dataset[i]
+    #         original_image = x.squeeze().cpu().numpy()  # Исходное изображение (H, W)
+    #         x = x.unsqueeze(0)  # Добавляем размерность batch (1, C, H, W)
+
+    #         # Пропускаем через conv1
+    #         with torch.no_grad():
+    #             activations_conv1 = self.conv1(x).squeeze(0).cpu().numpy()  # (C, H, W)
+
+    #         # Пропускаем через conv2
+    #         with torch.no_grad():
+    #             activations_conv2 = self.conv2(self.conv1(x)).squeeze(0).cpu().numpy()  # (C, H, W)
+
+    #         # Отображаем исходное изображение
+    #         axes[i, 0].imshow(original_image, cmap='gray')
+    #         axes[i, 0].set_title(f'Original Image\nLabel: {y}')
+    #         axes[i, 0].axis('off')
+
+    #         # Отображаем активации после conv1
+    #         activations_to_show = min(activations_conv1.shape[0], 10)  # Максимум 10 каналов
+    #         for j in range(activations_to_show):
+    #             axes[i, 1].imshow(activations_conv1[j], cmap='viridis')
+    #             axes[i, 1].set_title(f'Conv1 Activations\nChannel {j + 1}')
+    #             axes[i, 1].axis('off')
+    #             break  # Показываем только первый канал для наглядности
+
+    #         # Отображаем активации после conv2
+    #         activations_to_show = min(activations_conv2.shape[0], 10)  # Максимум 10 каналов
+    #         for j in range(activations_to_show):
+    #             axes[i, 2].imshow(activations_conv2[j], cmap='viridis')
+    #             axes[i, 2].set_title(f'Conv2 Activations\nChannel {j + 1}')
+    #             axes[i, 2].axis('off')
+    #             break  # Показываем только первый канал для наглядности
+
+    #     plt.show()
 
 # Модель с увеличенным количеством фильтров
 class LargerFiltersModel(nn.Module):
@@ -183,7 +238,7 @@ for name, model in models.items():
     print(f"Training {name}...")
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     train_losses, val_losses, train_accuracies, val_accuracies = train_and_evaluate(
-        model, train_loader, test_loader, criterion, optimizer, num_epochs=15
+        model, train_loader, test_loader, criterion, optimizer, num_epochs=1
     )
     results[name] = {
         "train_losses": train_losses,
@@ -255,3 +310,5 @@ for name, metrics in final_results.items():
     print(f"  Precision: {metrics['Precision']:.4f}")
     print(f"  Recall: {metrics['Recall']:.4f}")
     print(f"  F1-Score: {metrics['F1-Score']:.4f}")
+    
+# model.visualize_activations(train_dataset, num_images=5)
