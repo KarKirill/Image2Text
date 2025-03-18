@@ -126,7 +126,7 @@ class LargerFiltersModel(nn.Module):
         x = self.dropout2(x)
         x = self.fc2(x)
         return x
-
+    
 # Модель с дополнительным полносвязным слоем
 class DeeperFCModel(nn.Module):
     def __init__(self):
